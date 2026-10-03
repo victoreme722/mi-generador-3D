@@ -1,4 +1,5 @@
 blender
 ffmpeg
 libgl1
+libegl1
 libglib2.0-0
