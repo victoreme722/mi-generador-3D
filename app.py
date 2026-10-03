@@ -20,7 +20,12 @@ color_hex = color_hex.lstrip('#')
 r, g, b = [int(color_hex[i:i+2], 16) / 255.0 for i in (0, 2, 4)]
 
 if st.button("🚀 Renderizar Video 3D", use_container_width=True):
-    with st.spinner("Procesando fotogramas 3D con Blender... esto puede tomar unos segundos."):        
+    with st.spinner("Procesando fotogramas 3D con Blender en CPU... esto tomará unos segundos."):
+        # Configurar variables de entorno para forzar renderizado software (sin GPU)
+        env = os.environ.copy()
+        env["LIBGL_ALWAYS_SOFTWARE"] = "1"
+        env["GALLIUM_DRIVER"] = "llvmpipe"
+        
         # Ejecutar Blender en modo Headless (-b)
         cmd = [
             "blender",
@@ -33,7 +38,7 @@ if st.button("🚀 Renderizar Video 3D", use_container_width=True):
         ]
         
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True, env=env)
             video_path = "/tmp/output_render.mp4"
             
             if os.path.exists(video_path):
@@ -54,4 +59,4 @@ if st.button("🚀 Renderizar Video 3D", use_container_width=True):
         except subprocess.CalledProcessError as e:
             st.error("Error durante el renderizado 3D.")
             st.code(e.stderr if e.stderr else e.stdout)
-          
+                                    
